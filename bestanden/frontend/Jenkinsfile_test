@@ -1,0 +1,45 @@
+//Pipeline voor Project
+node{
+
+gitlabBuilds(builds: ['Git', 'Build', 'Push', 'Clean', 'Deploy']) {
+  stage('Git'){
+       gitlabCommitStatus(name: 'Git') {
+        git branch: 'dev', credentialsId: '592fb471-c1e6-4d0a-a8f5-7fbc90664948', url: 'ssh://git@172.17.0.1:10022/groep7/fipsim_gui.git'
+            }
+    }
+
+  stage("Build"){
+      gitlabCommitStatus(name: 'Build') {
+        sh "docker build -t groep7team/frontend_test ."
+      }
+    }
+
+    stage("Push"){
+    gitlabCommitStatus(name: 'Push') {
+     build 'Push_frontend_test'
+    }
+   }
+
+  stage("Clean"){
+    gitlabCommitStatus(name: 'Clean') {
+        sh "chmod +x clean.sh && ./clean.sh"
+    }
+   }
+
+  stage("Deploy"){
+    gitlabCommitStatus(name: 'Deploy') {
+      sh "ssh student@192.168.7.10 /home/student/scripts/test_deploy_frontend.sh"
+
+      //probeer images met tag <none> te verwijderen, indien dit niet lukt vanwege een running container -> niet erg, maar mag geen error geven.
+      try {
+      sh "ssh student@192.168.7.10 /home/student/scripts/clear_docker.sh"
+      } catch(err){}
+
+    }
+   }
+
+
+}
+}
+
+

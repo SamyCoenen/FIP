@@ -1,0 +1,61 @@
+//Pipeline voor backend_prod
+node{
+
+gitlabBuilds(builds: ['Git', 'Build', 'Test', 'Push', 'Clean', 'Deploy']) {
+  stage('Git'){
+       gitlabCommitStatus(name: 'Git') {
+        git branch: 'master', credentialsId: '592fb471-c1e6-4d0a-a8f5-7fbc90664948', url: 'ssh://git@172.17.0.1:10022/groep7/fipsim.git'
+            }
+    }
+
+  stage("Build"){
+      gitlabCommitStatus(name: 'Build') {
+      // sh "docker rmi groep7team/backend_prod:latest"
+       sh "docker build -t groep7team/backend_prod ."
+      }
+    }
+
+  stage("Test"){
+    gitlabCommitStatus(name: 'Test') {
+     try {
+      sh "chmod +x startTest_prod.sh && ./startTest_prod.sh"
+      junit 'junit.xml'
+      build 'Test_Backend_Prod'
+    } catch(err) {
+        junit 'junit.xml'
+        build 'Test_Backend_Prod'
+        throw err
+    }
+    }
+   }
+
+
+
+  stage("Push"){
+    gitlabCommitStatus(name: 'Push') {
+     build 'Push_backend_prod'
+    }
+   }
+
+  stage("Clean"){
+    gitlabCommitStatus(name: 'Clean') {
+        sh "chmod +x clean.sh && ./clean.sh"
+    }
+   }
+
+  stage("Deploy"){
+    gitlabCommitStatus(name: 'Deploy') {
+      sh "ssh student@192.168.7.10 /home/student/scripts/prod_deploy_backend.sh"
+
+      //probeer images met tag <none> te verwijderen, indien dit niet lukt vanwege een running container -> niet erg, maar mag geen error geven.
+      try {
+      sh "ssh student@192.168.7.10 /home/student/scripts/clear_docker.sh"
+      } catch(err){}
+
+    }
+   }
+
+}
+}
+
+

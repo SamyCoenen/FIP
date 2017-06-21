@@ -12,6 +12,19 @@ Daarna is de applicatie beschikbaar op localhost op poort 80.
 
 ![](media/img/overzicht.png)
 
+# Contributors
+
+| Member | Role |
+| :---: | :---: | 
+| Thomas Simaels | Project Leader |
+| Gijs Verbeeck | Scrum Master |
+| Samy Coenen | DevOps Engineer |
+| Filip Rutgeerts | DevOps Engineer |
+| Kim Gijbels | Back-end Developer | 
+| Robin Lycops | Back-end Developer |
+| Cyril Knops | Front-end Developer |
+| Toon Derkoningen | Front-end Developer |
+
 # Licentie
 
 
